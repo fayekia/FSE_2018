@@ -1,0 +1,111 @@
+README
+
+*The research dataset used in the work can be found at
+(Eclipse) 
+2011.msrconf.org/msr-challenge.html
+(Mozilla)
+github.com/jxshin/mzdata/tree/master/data/2016/level0
+
+
+We replicated three studies in this work, i.e., Issue Localization (ICSE'12), Duplicate Detection (ASE'11), Fix-time Prediction (CSMR'12).
+
+
+[Issue Localization]
+
+[Download]
+
+*The script/program and dataset is downloaded from
+storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/bugcenter/BugLocator.zip
+
+*The source files of Eclipse v3.1 is downloaded from
+archive.eclipse.org/eclipse/downloads/drops/R-3.1-200506271435/eclipse-sourceBuild-srcIncluded-3.1.zip
+
+[Description]
+BugLocator.zip contains BugLocator.jar and data/EclipseBugRepository.xml, which are needed in this replication experiment. 
+But it does not contain the source files of Eclipse.
+
+According to the issue id (i.e., bug id) recorded in data/EclipseBugRepository and Eclipse2011 (a MySql dump of Eclipse, the available link is provided above), we searched initial Summary for each issue to compose EclipseBugRepository_initial.xml
+
+So far, the input data of BugLocator.jar is ready.
+*EclipseBugRepository_initial.xml (or EclipseBugRepository_initial.xml)
+*Eclipse v3.1 source files
+
+*When running the script/program, the alpha factor is set to 0
+*The command is 
+java -jar BugLocator.jar -b <path of EclipseBugRepository_initial.xml> -s <path of Eclipse source files folder> -a 0 -o <path of output file>
+
+
+
+[Duplicate Detection]
+
+[Download]
+
+*The script/program is downloaded from
+www.comp.nus.edu.sg/~specmine/suncn/ase11/dbrd-ase11.tar
+
+*The datasets of the original paper are downloaded from
+http://www.comp.nus.edu.sg/~specmine/suncn/ase11/large-eclipse.txt.tar.bz2
+http://www.comp.nus.edu.sg/~specmine/suncn/ase11/large-mozilla.txt.tar.bz2
+
+[Description]
+
+dbrd-ase11.tar contains dbrd and full-textual-full-categorial.cfg, which are needed in this replication experiment. 
+The executable program (i.e., dbrd) is a binary file, which is needed to run on Linux.
+
+The input file of the executable program is large-eclispe.txt or large-mozilla.txt
+To conduct the comparative experiment, the studied issue reports should exist both in the original paper's dataset (i.e., large-eclispe.txt or large-mozilla.txt) and our dataset (i.e., Eclipse2011 and Mozilla2016). 
+However, not all issue reports in the original paper's dataset can be found in our dataset.
+Therefore, the bag of words is changed in replication experiment.
+Moreover, the value of textual feature is dictionary value, which lost semantic information and could not be recovered to textual information. 
+Thus, to conduct the comparative experiment, the input file must be over-written. 
+
+According to the issue id (i.e., bug id) recorded in large-eclispe.txt (or large-mozilla.txt) and Eclipse2011 (or Mozilla2016), we retrieved  initial Summary, Product, Component, Priority and description for each issue to compose new input file.
+
+*According to the original paper, we use the config file full-textual-full-categorial.cfg and set the iteration number to 5
+*The command is 
+./dbrd -i 5 -n <name of output file>  -r full-textual-full-categorial.cfg <path of input file> 
+
+
+
+[Fix-time Prediction]
+
+[Download]
+
+The original paper does not provide script/program and dataset.
+
+[Description]
+
+The input file is extracted from Eclipse2011 and Mozilla2016. According to the original paper, the issue report who was reported before October 2007 in Eclipse (July 2008 in Mozilla) is selected.
+
+The main contribution of the original paper is the filtering step, thus the comparative experiments are consisted of two groups, i.e., before-filtering and after-filtering.
+
+*The shreshold of filtering data is set to 0.125.
+
+*The ML tool is Weka v3.8.1.
+
+According to the characteristic of features (e.g., component_id), the features are preprocessed to nominal features.
+
+The machine learning algorithm is Naive Bayes classifier.
+
+The approach is evaluated through 10-Fold Cross-validation.
+
+The evaluation measurement AUC is shown as ROC in Weka.
+
+
+
+
+
+*We followed exactly the same experimental setting and ran the same scripts to conduct the reproduction. However, the replicated results are not exactly the same as the results in the original papers due to the following reasons.
+
+For issue localization: 
+The experiment is conducted on Eclipse but the authors didn't provide the source files (i.e., Eclipse v3.1, which contains 12,863 files as reported in the original paper), so we downloaded Eclipse v3.1 from Eclipse official website, which contains 11,892 files. This may explain the difference between our results and the original paper's results.
+
+For duplicate detection: 
+a) The approach introduces randomness, as stated in the original paper "the training set is constructed randomly and the gradient descent also involves randomness."
+b) The studied issue reports should exist both in the original paper's datasets and our datasets so that we can extract modified data and initial data to conduct the comparative experiments. However, some issues, e.g., open security bugs may be hidden upon reported and later went public (see sanitization process of Mozilla: https://bugzilla.mozilla.org/show_bug.cgi?id=838947). The proportion of these issues is less than 0.03%. This difference also leads to the difference in weights of text-features because the bags of words are different.
+
+For fix-time prediction:
+a) It adopts 10-folds cross validation, which introduces randomness.
+b) As explained above, the dumps may not be exactly the same.
+
+
